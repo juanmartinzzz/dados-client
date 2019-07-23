@@ -1,112 +1,91 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { upsert, onSnapshot, getDocsWithId, remove } from "../../../services/firebase";
 import GamesPage from "./GamesPage";
-import ApiService from "../../../services/ApiService";
-
-const apiService = new ApiService();
 
 const initialValues = {
-  name: "",
-  email: ""
+  type: "default",
+  players: [1,2,3],
+  dice: [null,null,null,null,null],
 };
 
 class GamesContainer extends Component {
   state = {
-    user: initialValues,
-    users: [],
+    game: initialValues,
+    games: [],
     error: false,
     adding: false,
     refresh: false
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.setState({ refresh: true });
+
+    onSnapshot("games", null, null, querySnapshot => {
+      const games = getDocsWithId(querySnapshot);
+
+      this.setState({games, refresh: false});
+    });
   }
 
-  async componentDidUpdate(prevProps, { refresh: prevRefresh }) {
-    const { refresh } = this.state;
-
-    if (refresh && !prevRefresh) {
-      const users = await apiService.get("/users", { sort: "name" });
-      this.setState({ users, refresh: false });
-    }
-  }
-
-  handleUserDetail = user => {
-    this.props.history.push(`/tasks/${user.id}`);
+  handlePlayGame = game => {
+    this.props.history.push(`/game/${game.id}`);
   };
 
   handleAdd = () => {
     this.setState({ adding: true });
   };
 
-  handleEdit = user => {
-    this.setState({ adding: true, user });
+  handleCancel = () => {
+    this.setState({ adding: false, game: initialValues });
   };
 
   handleChange = ({ target }) => {
-    const user = { ...this.state.user, [target.name]: target.value };
-    this.setState({ user });
+    const game = { ...this.state.game, [target.name]: target.value };
+    this.setState({ game });
   };
 
   handleUpsert = async () => {
-    const { user } = this.state;
+    this.setState({ refresh: true });
 
     try {
-      if (!user.id) {
-        await apiService.post("/users", user);
-      } else {
-        await apiService.patch(`/users/${user.id}`, {
-          name: user.name,
-          email: user.email
-        });
-      }
-      this.setState({
-        adding: false,
-        error: false,
-        refresh: true,
-        user: initialValues
-      });
+      await upsert("games", this.state.game);
+
+      this.setState({ adding: false, game: initialValues });
     } catch (error) {
       // TODO check error from API to give detailed errors, show errors in fields
       this.setState({ error: true });
-      this.props.handleOpenSnackbar("There was an Error creating the User");
+      this.props.handleOpenSnackbar(`There was an Error creating the Game ${error}`);
     }
   };
 
-  handleDelete = async user => {
-    if (user.tasks.length > 0) {
-      this.props.handleOpenSnackbar(
-        `Can't remove ${user.name}; please remove their ${user.tasks.length} Tasks first.`
-      );
-      return;
-    }
-
+  handleDelete = async game => {
     try {
-      await apiService.delete(`/users/${user.id}`);
       this.setState({ refresh: true });
+
+      await remove("games", game.id);
     } catch (error) {
       // TODO check error from API to give detailed referential integrity errors
-      this.props.handleOpenSnackbar(`There was an Error removing ${user.name}`);
+      this.props.handleOpenSnackbar(`There was an Error removing ${game.name}`);
     }
   };
 
   render() {
-    const { user, users, error, adding, refresh } = this.state;
+    const { game, games, error, adding, refresh } = this.state;
 
     return (
       <GamesPage
-        user={user}
-        users={users}
+        game={game}
+        games={games}
         error={error}
         adding={adding}
         loading={refresh}
         handleAdd={this.handleAdd}
-        handleEdit={this.handleEdit}
+        handleCancel={this.handleCancel}
         handleDelete={this.handleDelete}
         handleUpsert={this.handleUpsert}
         handleChange={this.handleChange}
-        handleUserDetail={this.handleUserDetail}
+        handlePlayGame={this.handlePlayGame}
       />
     );
   }

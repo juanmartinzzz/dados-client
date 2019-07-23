@@ -1,100 +1,109 @@
 import React, { Fragment } from "react";
 import Table from "../../reusable/Table";
 import Action from "../../reusable/Action";
-import { TextField, Button } from "@material-ui/core";
-import Edit from "@material-ui/icons/Edit";
+import { Button, Select, MenuItem, Typography } from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
 
+const muiColorMap = {
+  forced: "secondary",
+  default: "textPrimary",
+};
+
 const getTableData = ({
-  user,
-  users,
+  game,
+  games,
   error,
-  handleEdit,
   handleDelete,
   handleChange
 }) => ({
   headers: {
-    name: {},
-    email: {},
-    tasks: {
-      align: "right"
-    },
+    id: {},
+    players: {},
+    type: {},
+    finished: {},
     actions: {
       align: "right"
     }
   },
   inputs: {
-    name: (
-      <TextField
-        fullWidth
+    type: (
+      <Select
+        name="type"
         error={error}
-        name="name"
-        value={user.name}
+        value={game.type}
         onChange={handleChange}
-      />
-    ),
-    email: (
-      <TextField
-        fullWidth
-        error={error}
-        name="email"
-        value={user.email}
-        onChange={handleChange}
-      />
+        key={Math.random()}
+      >
+        <MenuItem value="default">
+          <Typography color={muiColorMap.default}>Default</Typography>
+        </MenuItem>
+        <MenuItem value="forced">
+          <Typography color={muiColorMap.forced}>Forced</Typography>
+        </MenuItem>
+      </Select>
     )
   },
-  rows: users.map(user => ({
-    ...user,
-    tasks: user.tasks.length,
+  rows: games.map(game => ({
+    ...game,
+    players: game.players.map(player => <span key={Math.random()}>{player}</span>),
+    type: <Typography color={muiColorMap[game.type]}>{game.type.toUpperCase()}</Typography>,
+    finished: "NO",
     actions: (
-      <Fragment>
-        <Action
-          title={`Edit ${user.name}`}
-          onClick={() => handleEdit(user)}
-          Icon={Edit}
-        />
-        <Action
-          title={`Remove ${user.name}`}
-          onClick={() => handleDelete(user)}
-          Icon={Delete}
-        />
-      </Fragment>
+      <Action
+        title={`Remove ${game.id}`}
+        onClick={() => handleDelete(game)}
+        Icon={Delete}
+        key={Math.random()}
+      />
     )
   }))
 });
 
 const GamesPage = ({
-  user,
-  users,
+  game,
+  games,
   error,
   adding,
   loading,
   handleAdd,
-  handleEdit,
+  handleCancel,
   handleDelete,
   handleUpsert,
   handleChange,
-  handleUserDetail
+  handlePlayGame
 }) => (
   <Table
     title="Games"
     adding={adding}
     loading={loading}
     actions={
-      <Button
-        onClick={adding ? handleUpsert : handleAdd}
-        variant={adding ? "contained" : "text"}
-        color={adding ? "primary" : "default"}
-      >
-        {adding ? "SAVE" : "NEW GAME"}
-      </Button>
+      <span>
+        <Button
+          variant="contained"
+          onClick={adding ? handleUpsert : handleAdd}
+          color={adding ? "primary" : "default"}
+        >
+          {adding ? "SAVE" : "NEW GAME"}
+        </Button>
+        {adding &&
+          (<Fragment>
+            &nbsp; &nbsp; &nbsp;
+            <Button
+              variant="contained"
+              onClick={handleCancel}
+            >
+              CANCEL
+            </Button>
+          </Fragment>
+          )
+        }
+      </span>
     }
-    rowClick={handleUserDetail}
+    rowClick={handlePlayGame}
     tableData={getTableData({
-      user,
-      users,
+      game,
+      games,
       error,
-      handleEdit,
       handleDelete,
       handleChange
     })}
