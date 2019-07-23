@@ -22,6 +22,10 @@ const StyledToolbar = styled(MuiToolbar)`
   justify-content: space-between;
 `;
 
+const StyledTableRow = styled(TableRow)`
+  cursor: ${props => props.onClick ? "pointer" : "default"};
+`;
+
 const Toolbar = ({ title, actions }) => (
   <StyledToolbar>
     <Typography variant="h6" id="tableTitle">
@@ -49,16 +53,16 @@ const InputsRow = ({ headers, inputs, adding }) => {
 };
 
 const Row = ({ headers, row, rowClick }) => (
-  <TableRow onClick={() => rowClick(row)} hover>
+  <StyledTableRow onClick={rowClick ? () => rowClick(row) : null} hover>
     {Object.keys(row).map(
       key =>
         headers[key] && (
-          <TableCell {...headers[key]} key={key}>
+          <TableCell {...headers[key]} key={key} >
             {row[key]}
           </TableCell>
         )
     )}
-  </TableRow>
+  </StyledTableRow>
 );
 
 const Table = ({ title, adding, loading, actions, rowClick, tableData }) => {
