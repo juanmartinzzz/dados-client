@@ -9,7 +9,7 @@ const history = createBrowserHistory();
 
 const AppPage = (Component, title) => () => (
   <Layout Component={Component} title={title} />
-)
+);
 
 const AppGames = AppPage(Games, "Games Admin");
 const AppUsers = AppPage(Users, "Users Admin");

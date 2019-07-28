@@ -23,7 +23,7 @@ const StyledToolbar = styled(MuiToolbar)`
 `;
 
 const StyledTableRow = styled(TableRow)`
-  cursor: ${props => props.onClick ? "pointer" : "default"};
+  cursor: ${props => (props.onClick ? "pointer" : "default")};
 `;
 
 const Toolbar = ({ title, actions }) => (
@@ -57,7 +57,7 @@ const Row = ({ headers, row, rowClick }) => (
     {Object.keys(row).map(
       key =>
         headers[key] && (
-          <TableCell {...headers[key]} key={key} >
+          <TableCell {...headers[key]} key={key}>
             {row[key]}
           </TableCell>
         )

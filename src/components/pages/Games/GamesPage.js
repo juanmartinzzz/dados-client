@@ -6,16 +6,10 @@ import Delete from "@material-ui/icons/Delete";
 
 const muiColorMap = {
   forced: "secondary",
-  default: "textPrimary",
+  default: "textPrimary"
 };
 
-const getTableData = ({
-  game,
-  games,
-  error,
-  handleDelete,
-  handleChange
-}) => ({
+const getTableData = ({ game, games, error, handleDelete, handleChange }) => ({
   headers: {
     id: {},
     players: {},
@@ -45,8 +39,14 @@ const getTableData = ({
   },
   rows: games.map(game => ({
     ...game,
-    players: game.players.map(player => <span key={Math.random()}>{player}</span>),
-    type: <Typography color={muiColorMap[game.type]}>{game.type.toUpperCase()}</Typography>,
+    players: game.players.map(player => (
+      <span key={Math.random()}>{player}</span>
+    )),
+    type: (
+      <Typography color={muiColorMap[game.type]}>
+        {game.type.toUpperCase()}
+      </Typography>
+    ),
     finished: "NO",
     actions: (
       <Action
@@ -85,18 +85,14 @@ const GamesPage = ({
         >
           {adding ? "SAVE" : "NEW GAME"}
         </Button>
-        {adding &&
-          (<Fragment>
+        {adding && (
+          <Fragment>
             &nbsp; &nbsp; &nbsp;
-            <Button
-              variant="contained"
-              onClick={handleCancel}
-            >
+            <Button variant="contained" onClick={handleCancel}>
               CANCEL
             </Button>
           </Fragment>
-          )
-        }
+        )}
       </span>
     }
     rowClick={handlePlayGame}
