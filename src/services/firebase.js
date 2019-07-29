@@ -26,22 +26,31 @@ export const onSnapshot = async (collection, conditions, limit, callback) => {
 };
 
 export const get = async (collection, conditions, limit) => {
-  const queryLimit = limit ? limit : 10;
-  const querySnapshot = await db
-    .collection(collection)
-    .limit(queryLimit)
-    .get();
+  const query = db.collection(collection);
+  if (limit !== -1) {
+    const queryLimit = limit ? limit : 10;
+    query.limit(queryLimit);
+  }
+  const querySnapshot = await query.get();
 
   return getDocsWithId(querySnapshot);
 };
 
 export const upsert = async (collection, values) => {
   const reference = db.collection(collection);
+  const currentDate = new Date();
 
   if (values.id) {
-    reference.doc(values.id).set(values);
+    reference.doc(values.id).set({
+      ...values,
+      dateUpdated: currentDate
+    });
   } else {
-    reference.doc().set(values);
+    reference.doc().set({
+      ...values,
+      dateCreated: currentDate,
+      dateUpdated: currentDate
+    });
   }
 };
 
