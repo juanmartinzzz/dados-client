@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import {
+  upsert,
+  onSnapshot,
+  getDocsWithId,
+  remove
+} from "../../../services/firebase";
 import UsersPage from "./UsersPage";
-import ApiService from "../../../services/ApiService";
-
-const apiService = new ApiService();
 
 const initialValues = {
   name: "",
@@ -19,29 +22,22 @@ class UsersContainer extends Component {
     refresh: false
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.setState({ refresh: true });
-  }
 
-  async componentDidUpdate(prevProps, { refresh: prevRefresh }) {
-    const { refresh } = this.state;
+    onSnapshot("users", null, null, querySnapshot => {
+      const users = getDocsWithId(querySnapshot);
 
-    if (refresh && !prevRefresh) {
-      const users = await apiService.get("/users", { sort: "name" });
       this.setState({ users, refresh: false });
-    }
+    });
   }
-
-  handleUserDetail = user => {
-    this.props.history.push(`/tasks/${user.id}`);
-  };
 
   handleAdd = () => {
     this.setState({ adding: true });
   };
 
-  handleEdit = user => {
-    this.setState({ adding: true, user });
+  handleCancel = () => {
+    this.setState({ adding: false, user: initialValues });
   };
 
   handleChange = ({ target }) => {
@@ -49,42 +45,31 @@ class UsersContainer extends Component {
     this.setState({ user });
   };
 
+  handleEdit = user => {
+    this.setState({ user, adding: true });
+  };
+
   handleUpsert = async () => {
-    const { user } = this.state;
+    this.setState({ refresh: true });
 
     try {
-      if (!user.id) {
-        await apiService.post("/users", user);
-      } else {
-        await apiService.patch(`/users/${user.id}`, {
-          name: user.name,
-          email: user.email
-        });
-      }
-      this.setState({
-        adding: false,
-        error: false,
-        refresh: true,
-        user: initialValues
-      });
+      await upsert("users", this.state.user);
+
+      this.setState({ adding: false, user: initialValues });
     } catch (error) {
       // TODO check error from API to give detailed errors, show errors in fields
       this.setState({ error: true });
-      this.props.handleOpenSnackbar("There was an Error creating the User");
+      this.props.handleOpenSnackbar(
+        `There was an Error creating the User: ${error}`
+      );
     }
   };
 
   handleDelete = async user => {
-    if (user.tasks.length > 0) {
-      this.props.handleOpenSnackbar(
-        `Can't remove ${user.name}; please remove their ${user.tasks.length} Tasks first.`
-      );
-      return;
-    }
-
     try {
-      await apiService.delete(`/users/${user.id}`);
       this.setState({ refresh: true });
+
+      await remove("users", user.id);
     } catch (error) {
       // TODO check error from API to give detailed referential integrity errors
       this.props.handleOpenSnackbar(`There was an Error removing ${user.name}`);
@@ -103,10 +88,10 @@ class UsersContainer extends Component {
         loading={refresh}
         handleAdd={this.handleAdd}
         handleEdit={this.handleEdit}
+        handleCancel={this.handleCancel}
         handleDelete={this.handleDelete}
         handleUpsert={this.handleUpsert}
         handleChange={this.handleChange}
-        handleUserDetail={this.handleUserDetail}
       />
     );
   }

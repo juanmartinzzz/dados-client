@@ -1,9 +1,20 @@
 import React, { Fragment } from "react";
 import Table from "../../reusable/Table";
 import Action from "../../reusable/Action";
-import { TextField, Button } from "@material-ui/core";
-import Edit from "@material-ui/icons/Edit";
+import {
+  Button,
+  Select,
+  MenuItem,
+  Typography,
+  TextField
+} from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
+import Edit from "@material-ui/icons/Edit";
+
+const muiColorMap = {
+  forced: "secondary",
+  default: "textPrimary"
+};
 
 const getTableData = ({
   user,
@@ -14,11 +25,9 @@ const getTableData = ({
   handleChange
 }) => ({
   headers: {
+    id: {},
     name: {},
     email: {},
-    tasks: {
-      align: "right"
-    },
     actions: {
       align: "right"
     }
@@ -45,7 +54,6 @@ const getTableData = ({
   },
   rows: users.map(user => ({
     ...user,
-    tasks: user.tasks.length,
     actions: (
       <Fragment>
         <Action
@@ -71,25 +79,35 @@ const UsersPage = ({
   loading,
   handleAdd,
   handleEdit,
+  handleCancel,
   handleDelete,
   handleUpsert,
   handleChange,
-  handleUserDetail
+  handlePlayGame
 }) => (
   <Table
     title="Users"
     adding={adding}
     loading={loading}
     actions={
-      <Button
-        onClick={adding ? handleUpsert : handleAdd}
-        variant={adding ? "contained" : "text"}
-        color={adding ? "primary" : "default"}
-      >
-        {adding ? "SAVE" : "ADD USER"}
-      </Button>
+      <span>
+        <Button
+          variant="contained"
+          onClick={adding ? handleUpsert : handleAdd}
+          color={adding ? "primary" : "default"}
+        >
+          {adding ? "SAVE" : "NEW USER"}
+        </Button>
+        {adding && (
+          <Fragment>
+            &nbsp; &nbsp; &nbsp;
+            <Button variant="contained" onClick={handleCancel}>
+              CANCEL
+            </Button>
+          </Fragment>
+        )}
+      </span>
     }
-    rowClick={handleUserDetail}
     tableData={getTableData({
       user,
       users,

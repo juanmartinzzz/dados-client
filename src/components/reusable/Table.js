@@ -23,7 +23,11 @@ const StyledToolbar = styled(MuiToolbar)`
 `;
 
 const StyledTableRow = styled(TableRow)`
-  cursor: ${props => props.onClick ? "pointer" : "default"};
+  cursor: ${props => (props.onClick ? "pointer" : "default")};
+`;
+
+const InputsTableRow = styled(TableRow)`
+  background-color: rgb(220, 220, 220);
 `;
 
 const Toolbar = ({ title, actions }) => (
@@ -39,13 +43,13 @@ const Toolbar = ({ title, actions }) => (
 const InputsRow = ({ headers, inputs, adding }) => {
   if (adding && inputs) {
     return (
-      <TableRow>
+      <InputsTableRow>
         {Object.keys(headers).map(key => (
           <TableCell {...headers[key]} key={key}>
             {inputs[key]}
           </TableCell>
         ))}
-      </TableRow>
+      </InputsTableRow>
     );
   }
 
@@ -54,14 +58,11 @@ const InputsRow = ({ headers, inputs, adding }) => {
 
 const Row = ({ headers, row, rowClick }) => (
   <StyledTableRow onClick={rowClick ? () => rowClick(row) : null} hover>
-    {Object.keys(row).map(
-      key =>
-        headers[key] && (
-          <TableCell {...headers[key]} key={key} >
-            {row[key]}
-          </TableCell>
-        )
-    )}
+    {Object.keys(headers).map(header => (
+      <TableCell {...headers[header]} key={header}>
+        {row[header]}
+      </TableCell>
+    ))}
   </StyledTableRow>
 );
 
@@ -84,11 +85,7 @@ const Table = ({ title, adding, loading, actions, rowClick, tableData }) => {
         </TableHead>
 
         <TableBody>
-          <InputsRow
-            adding={adding}
-            headers={headers}
-            inputs={inputs}
-          ></InputsRow>
+          <InputsRow adding={adding} headers={headers} inputs={inputs} />
           {rows.map((row, index) => (
             <Row row={row} headers={headers} rowClick={rowClick} key={index} />
           ))}

@@ -9,7 +9,7 @@ const history = createBrowserHistory();
 
 const AppPage = (Component, title) => () => (
   <Layout Component={Component} title={title} />
-)
+);
 
 const AppGames = AppPage(Games, "Games Admin");
 const AppUsers = AppPage(Users, "Users Admin");
@@ -17,8 +17,8 @@ const AppUsers = AppPage(Users, "Users Admin");
 const Routes = () => (
   <Router history={history}>
     <Switch>
-      <Route path="/" component={AppGames} />
-      {/* <Route exact path="/users" component={AppUsers} /> */}
+      <Route exact path="/" component={AppGames} />
+      <Route exact path="/users" component={AppUsers} />
     </Switch>
   </Router>
 );

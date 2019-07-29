@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { upsert, onSnapshot, getDocsWithId, remove } from "../../../services/firebase";
+import {
+  upsert,
+  onSnapshot,
+  getDocsWithId,
+  remove
+} from "../../../services/firebase";
 import GamesPage from "./GamesPage";
 
 const initialValues = {
   type: "default",
-  players: [1,2,3],
-  dice: [null,null,null,null,null],
+  players: [1, 2, 3],
+  dice: [null, null, null, null, null]
 };
 
 class GamesContainer extends Component {
@@ -24,7 +29,7 @@ class GamesContainer extends Component {
     onSnapshot("games", null, null, querySnapshot => {
       const games = getDocsWithId(querySnapshot);
 
-      this.setState({games, refresh: false});
+      this.setState({ games, refresh: false });
     });
   }
 
@@ -55,7 +60,9 @@ class GamesContainer extends Component {
     } catch (error) {
       // TODO check error from API to give detailed errors, show errors in fields
       this.setState({ error: true });
-      this.props.handleOpenSnackbar(`There was an Error creating the Game ${error}`);
+      this.props.handleOpenSnackbar(
+        `There was an Error creating the Game ${error}`
+      );
     }
   };
 
