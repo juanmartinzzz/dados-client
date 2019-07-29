@@ -51,9 +51,6 @@ class GamesContainer extends Component {
   };
 
   handleChange = ({ target }) => {
-    console.log("--name", target.name);
-    console.log("--value", target.value);
-
     const game = { ...this.state.game, [target.name]: target.value };
     this.setState({ game });
   };
