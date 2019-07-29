@@ -1,20 +1,9 @@
 import React, { Fragment } from "react";
 import Table from "../../reusable/Table";
 import Action from "../../reusable/Action";
-import {
-  Button,
-  Select,
-  MenuItem,
-  Typography,
-  TextField
-} from "@material-ui/core";
+import { Button, TextField } from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
 import Edit from "@material-ui/icons/Edit";
-
-const muiColorMap = {
-  forced: "secondary",
-  default: "textPrimary"
-};
 
 const getTableData = ({
   user,

@@ -3,13 +3,21 @@ import Table from "../../reusable/Table";
 import Action from "../../reusable/Action";
 import { Button, Select, MenuItem, Typography } from "@material-ui/core";
 import Delete from "@material-ui/icons/Delete";
+import { Tag } from "../../reusable/styled";
 
 const muiColorMap = {
   forced: "secondary",
   default: "textPrimary"
 };
 
-const getTableData = ({ game, games, error, handleDelete, handleChange }) => ({
+const getTableData = ({
+  game,
+  games,
+  users,
+  error,
+  handleDelete,
+  handleChange
+}) => ({
   headers: {
     id: {},
     players: {},
@@ -26,7 +34,6 @@ const getTableData = ({ game, games, error, handleDelete, handleChange }) => ({
         error={error}
         value={game.type}
         onChange={handleChange}
-        key={Math.random()}
       >
         <MenuItem value="default">
           <Typography color={muiColorMap.default}>Default</Typography>
@@ -35,12 +42,27 @@ const getTableData = ({ game, games, error, handleDelete, handleChange }) => ({
           <Typography color={muiColorMap.forced}>Forced</Typography>
         </MenuItem>
       </Select>
+    ),
+    players: (
+      <Select
+        multiple
+        name="players"
+        error={error}
+        value={game.players}
+        onChange={handleChange}
+      >
+        {users.map(user => (
+          <MenuItem value={user.id} key={user.id}>
+            {user.name}
+          </MenuItem>
+        ))}
+      </Select>
     )
   },
   rows: games.map(game => ({
     ...game,
     players: game.players.map(player => (
-      <span key={Math.random()}>{player}</span>
+      <Tag key={player}>{users.find(user => user.id == player).name}</Tag>
     )),
     type: (
       <Typography color={muiColorMap[game.type]}>
@@ -62,6 +84,7 @@ const getTableData = ({ game, games, error, handleDelete, handleChange }) => ({
 const GamesPage = ({
   game,
   games,
+  users,
   error,
   adding,
   loading,
@@ -99,6 +122,7 @@ const GamesPage = ({
     tableData={getTableData({
       game,
       games,
+      users,
       error,
       handleDelete,
       handleChange

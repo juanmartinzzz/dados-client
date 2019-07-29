@@ -4,13 +4,14 @@ import {
   upsert,
   onSnapshot,
   getDocsWithId,
-  remove
+  remove,
+  get
 } from "../../../services/firebase";
 import GamesPage from "./GamesPage";
 
 const initialValues = {
   type: "default",
-  players: [1, 2, 3],
+  players: [],
   dice: [null, null, null, null, null]
 };
 
@@ -18,13 +19,17 @@ class GamesContainer extends Component {
   state = {
     game: initialValues,
     games: [],
+    users: [],
     error: false,
     adding: false,
     refresh: false
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({ refresh: true });
+
+    const users = await get("users", null, -1);
+    this.setState({ users });
 
     onSnapshot("games", null, null, querySnapshot => {
       const games = getDocsWithId(querySnapshot);
@@ -46,6 +51,9 @@ class GamesContainer extends Component {
   };
 
   handleChange = ({ target }) => {
+    console.log("--name", target.name);
+    console.log("--value", target.value);
+
     const game = { ...this.state.game, [target.name]: target.value };
     this.setState({ game });
   };
@@ -78,12 +86,13 @@ class GamesContainer extends Component {
   };
 
   render() {
-    const { game, games, error, adding, refresh } = this.state;
+    const { game, games, users, error, adding, refresh } = this.state;
 
     return (
       <GamesPage
         game={game}
         games={games}
+        users={users}
         error={error}
         adding={adding}
         loading={refresh}
