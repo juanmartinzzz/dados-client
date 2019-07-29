@@ -20,7 +20,7 @@ const getTableData = ({
   user,
   users,
   error,
-  handleUpsert,
+  handleEdit,
   handleDelete,
   handleChange
 }) => ({
@@ -58,7 +58,7 @@ const getTableData = ({
       <Fragment>
         <Action
           title={`Edit ${user.name}`}
-          onClick={() => handleUpsert(user)}
+          onClick={() => handleEdit(user)}
           Icon={Edit}
         />
         <Action
@@ -78,6 +78,7 @@ const UsersPage = ({
   adding,
   loading,
   handleAdd,
+  handleEdit,
   handleCancel,
   handleDelete,
   handleUpsert,
@@ -107,12 +108,11 @@ const UsersPage = ({
         )}
       </span>
     }
-    rowClick={handlePlayGame}
     tableData={getTableData({
       user,
       users,
       error,
-      handleUpsert,
+      handleEdit,
       handleDelete,
       handleChange
     })}

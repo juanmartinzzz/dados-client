@@ -9,15 +9,14 @@ import {
 import UsersPage from "./UsersPage";
 
 const initialValues = {
-  type: "default",
-  players: [1, 2, 3],
-  dice: [null, null, null, null, null]
+  name: "",
+  email: ""
 };
 
 class UsersContainer extends Component {
   state = {
-    game: initialValues,
-    games: [],
+    user: initialValues,
+    users: [],
     error: false,
     adding: false,
     refresh: false
@@ -27,9 +26,9 @@ class UsersContainer extends Component {
     this.setState({ refresh: true });
 
     onSnapshot("users", null, null, querySnapshot => {
-      const games = getDocsWithId(querySnapshot);
+      const users = getDocsWithId(querySnapshot);
 
-      this.setState({ games, refresh: false });
+      this.setState({ users, refresh: false });
     });
   }
 
@@ -38,21 +37,25 @@ class UsersContainer extends Component {
   };
 
   handleCancel = () => {
-    this.setState({ adding: false, game: initialValues });
+    this.setState({ adding: false, user: initialValues });
   };
 
   handleChange = ({ target }) => {
-    const game = { ...this.state.game, [target.name]: target.value };
-    this.setState({ game });
+    const user = { ...this.state.user, [target.name]: target.value };
+    this.setState({ user });
+  };
+
+  handleEdit = user => {
+    this.setState({ user, adding: true });
   };
 
   handleUpsert = async () => {
     this.setState({ refresh: true });
 
     try {
-      await upsert("users", this.state.game);
+      await upsert("users", this.state.user);
 
-      this.setState({ adding: false, game: initialValues });
+      this.setState({ adding: false, user: initialValues });
     } catch (error) {
       // TODO check error from API to give detailed errors, show errors in fields
       this.setState({ error: true });
@@ -84,6 +87,7 @@ class UsersContainer extends Component {
         adding={adding}
         loading={refresh}
         handleAdd={this.handleAdd}
+        handleEdit={this.handleEdit}
         handleCancel={this.handleCancel}
         handleDelete={this.handleDelete}
         handleUpsert={this.handleUpsert}
