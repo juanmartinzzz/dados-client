@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Tell git to use this directory for githooks running 
+# git config core.hooksPath .githooks
+# sudo chmod +x .githooks/pre-commit
+# sudo chmod +x bin/format-staged
+
+echo "------------------------------------------------------------------"
+echo "Running pre-commit githooks, this may take a moment"
+echo "These hooks will:"
+echo " * Run the code formatter"
+echo "------------------------------------------------------------------"
+
+echo "============================="
+echo "=     Running Formatter     ="
+echo "============================="
+bin/format-staged
+code=$?
+if [ "$code" != "0" ]; then
+  echo "============================="
+  echo "=     Formatter Failed      ="
+  echo "============================="
+  exit $code
+fi
+
+echo "============================="
+echo "=    Pre-Commit Passed!!    ="
+echo "============================="
+exit 0
